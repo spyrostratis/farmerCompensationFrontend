@@ -65,12 +65,13 @@ const goback = () => {
       </tr>
       <tr>
         <th>Identity ID</th>
-        <td>{{ data.identity_id }}</td>
+        <td>{{ data.identity }}</td>
       </tr>
 
       </tbody>
       <div>
         <button type="button" @click="goback">Go Back</button>
+
       </div>
     </table>
   </div>

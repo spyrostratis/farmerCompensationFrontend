@@ -1,51 +1,54 @@
 <script setup>
-import { ref, onMounted } from "vue";
+import {ref, computed, onMounted} from "vue";
 import { useRemoteData } from "@/composables/useRemoteData.js";
-import { useRoute } from "vue-router";
+import {useRoute, useRouter} from "vue-router";
 
-// Define refs
 const authRef = ref(true);
 
-// Use useRoute to get the route parameter
-const route = useRoute();
+const formDataRef = ref({
+  "username": "",
+  "email": "",
+  "address": "",
+  "afm": "",
+  "full_name": "",
+  "identity": ""
+});
+  const router = useRouter();
+  const route = useRoute();
+  const userIdRef = ref(null);
 
-const userIdRef = ref(route.params.id);
-const getUrl = 'http://localhost:9090/api/users/edit/'+ userIdRef.value + '/new';
-const postUrl = 'http://localhost:9090/api/users/edit/'+ userIdRef.value + '/new';
+userIdRef.value = route.params.id;
 
-// Fetch existing data on component mount
-const { data, loading: getDataLoading, performRequest } = useRemoteData(getUrl, authRef, "GET");
+  const urlRef = computed(() => {
+    return 'http://localhost:9090/api/users/edit/'+ userIdRef.value;
+  });
 
-// Function to handle form submission
 const onSubmit = async () => {
-  console.log("User data updated successfully!");
-
-  // Assuming 'data' contains the user information
-  const requestData = {
-    username: data.username,
-    email: data.email,
-    address: data.address,
-    afm: data.afm,
-    full_name: data.full_name,
-    identity_id: data.identity_id
-  };
-
-  const { performRequest, error: postError } = useRemoteData(postUrl, authRef, "POST");
-
-  if (postError) {
-    console.error("Error updating user data:", postError);
-    return; // Don't proceed with the update if there was an error
+  try {
+    await performPostRequest();
+    window.location.href="http://localhost:5173/users";  } catch (error) {
+    console.error('Error submitting form', error);
   }
-
-  await performRequest(requestData);
-  console.log("User data updated successfully!");
-
 };
 
-onMounted(() => {
-  userIdRef.value = route.params.id;
-  performRequest();
+const methodRefPost = ref("POST");
+
+const { performRequest: performPostRequest, loading } = useRemoteData(urlRef, authRef, methodRefPost, formDataRef);
+
+onMounted(async () => {
+  // Call a GET method on mount
+  methodRefGet.value = "GET"; // Change the request method to GET
+  await performGetRequest(); // Perform the GET request
 });
+
+const methodRefGet = ref("GET");
+
+const { data: getData, performRequest: performGetRequest} = useRemoteData(urlRef, authRef, methodRefGet);
+
+const goback = () => {
+  router.push('/user-details/'+ userIdRef.value);
+};
+
 </script>
 
 
@@ -53,31 +56,34 @@ onMounted(() => {
   <div class="container">
     <form @submit.prevent="onSubmit">
 
-      <div v-if="data">
-
+      <div v-if="getData">
+        <div><h1>Edit User {{getData.id}}</h1></div>
         <div class="form-group">
-          <label for="username">Username</label>
-          <input type="text" id="username" class="form-control" v-model="data.username">
+          <label for="username">Username: (current data -> {{getData.username}})</label>
+          <input type="text" id="username" class="form-control" v-model="formDataRef.username">
 
-          <label for="email">Email</label>
-          <input type="text" id="email" class="form-control" v-model="data.email">
+          <label for="email">Email: (current data -> {{getData.email}})</label>
+          <input type="text" id="email" class="form-control" v-model="formDataRef.email" >
 
-          <label for="address">Address</label>
-          <input type="text" id="address" class="form-control" v-model="data.address">
+          <label for="address">Address: (current data -> {{getData.address}})</label>
+          <input type="text" id="address" class="form-control" v-model="formDataRef.address" >
 
-          <label for="afm">AFM</label>
-          <input type="text" id="afm" class="form-control" v-model="data.afm">
+          <label for="afm">AFM: (current data -> {{getData.afm}})</label>
+          <input type="text" id="afm" class="form-control" v-model="formDataRef.afm" >
 
-          <label for="full_name">Full Name</label>
-          <input type="text" id="full_name" class="form-control" v-model="data.full_name">
+          <label for="full_name">Full Name: (current data -> {{getData.full_name}})</label>
+          <input type="text" id="full_name" class="form-control" v-model="formDataRef.full_name" >
 
-          <label for="identity_id">Identity ID</label>
-          <input type="text" id="identity_id" class="form-control" v-model="data.identity_id">
+          <label for="identity">Identity ID: (current data -> {{getData.identity}})</label>
+          <input type="text" id="identity" class="form-control" v-model="formDataRef.identity" >
+        </div>
+        <div style="display: flex; justify-content: space-between;">
+          <button type="button" class="btn-dark" @click="goback">Cancel Edit</button>
+          <button type="submit" class="btn btn-primary" :disabled="loading"> {{ loading ? 'Loading...' : 'Submit Changes' }}</button>
         </div>
 
-        <button type="submit" class="btn btn-primary" :disabled="loading"> {{ getDataLoading ? 'Loading...' : 'Submit Changes' }}</button>
-        </div>
-      <div v-if="loading">
+      </div>
+      <div v-if="postLoading">
         Loading...
       </div>
 
