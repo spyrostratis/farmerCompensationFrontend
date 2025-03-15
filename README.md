@@ -1,17 +1,26 @@
-# farmerFrontend
+# Farmer Compensation
 
-This template should help get you started developing with Vue 3 in Vite.
+## Overview
+
+The Farmer Compensation System is a web application that allows farmers to request compensation for field disasters. Inspectors and administrators process these requests, ensuring a structured and fair compensation process.
 
 ## Recommended IDE Setup
 
-[VSCode](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur) + [TypeScript Vue Plugin (Volar)](https://marketplace.visualstudio.com/items?itemName=Vue.vscode-typescript-vue-plugin).
-
-## Customize configuration
-
-See [Vite Configuration Reference](https://vitejs.dev/config/).
+Use [VSCode](https://code.visualstudio.com/) with: [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur) + [TypeScript Vue Plugin (Volar)](https://marketplace.visualstudio.com/items?itemName=Vue.vscode-typescript-vue-plugin).
 
 ## Project Setup
 
+### Prerequisites
+Ensure you have Node.js installed (v16+ recommended).
+
+### Clone the repository
+```sh
+git clone https://github.com/spyrostratis/farmerCompensationFrontend.git
+```
+```sh
+cd farmerCompensationFrontend
+```
+### Install dependencies
 ```sh
 npm install
 ```
